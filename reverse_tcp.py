@@ -43,7 +43,8 @@ class Server:
                 print(clientResponse)
 
 
-reverseTcp = Server("", 9999)
-reverseTcp.bindSocket()
-reverseTcp.acceptSocket()
-reverseTcp.sendCommands()
+if __name__ == '__main__':
+    reverseTcp = Server("", 9999)
+    reverseTcp.bindSocket()
+    reverseTcp.acceptSocket()
+    reverseTcp.sendCommands()
